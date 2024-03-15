@@ -3,8 +3,10 @@ package com.challenge.itausegdev.component;
 import com.challenge.itausegdev.model.CategoryTypes;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Map;
 import java.util.Objects;
 
@@ -20,6 +22,7 @@ import static com.challenge.itausegdev.component.TaxTypes.COFINS;
 
 import static java.util.Objects.requireNonNull;
 
+@Component
 public class Fares {
 
     private ImmutableMap<String, ImmutableMap<String, BigDecimal>> taxes = new ImmutableMap.Builder<String, ImmutableMap<String,BigDecimal>>()
@@ -79,7 +82,7 @@ public class Fares {
 
         BigDecimal cofinsTaxed = price.multiply(requireNonNull(taxes.get(category.name())).get(COFINS.name()));
 
-        return price.add(iofTaxed).add(pisTaxed).add(cofinsTaxed);
+        return price.add(iofTaxed).add(pisTaxed).add(cofinsTaxed).setScale(2, RoundingMode.HALF_EVEN);
     }
 
 }

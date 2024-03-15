@@ -7,7 +7,6 @@ import com.challenge.itausegdev.model.Product;
 import com.challenge.itausegdev.repository.ProductRepository;
 import com.challenge.itausegdev.service.request.ProductRequest;
 import com.challenge.itausegdev.service.response.ProductResponse;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -59,15 +58,7 @@ public class ProductService {
             throw new ProductNotFoundException();
         }
 
-        product.get().setNome(request.getNome());
-        product.get().setCategoria(CategoryTypes.valueOf(request.getCategoria()));
-        product.get().setPrecoBase(request.getPrecoBase());
-        product.get().setPrecoTarifado(
-                fares.calculateFare(
-                        request.getPrecoBase(),
-                        CategoryTypes.valueOf(request.getCategoria())
-                )
-        );
+        requestToEntity(request, product);
 
         return ProductResponse.toResponse(
                 productRepository.save(
@@ -76,7 +67,24 @@ public class ProductService {
         );
     }
 
+    private void requestToEntity(ProductRequest request, Optional<Product> product) {
+        if(product.isPresent()) {
+            product.get().setNome(request.getNome());
+            product.get().setCategoria(CategoryTypes.valueOf(request.getCategoria()));
+            product.get().setPrecoBase(request.getPrecoBase());
+            product.get().setPrecoTarifado(
+                    fares.calculateFare(
+                            request.getPrecoBase(),
+                            CategoryTypes.valueOf(request.getCategoria())
+                    )
+            );
+        }
+    }
+
     public void deleteById(UUID id) {
+        if(productRepository.findById(id).isEmpty()) {
+            throw new ProductNotFoundException();
+        }
         productRepository.deleteById(id);
     }
 
