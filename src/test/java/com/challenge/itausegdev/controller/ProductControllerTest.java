@@ -78,6 +78,17 @@ public class ProductControllerTest {
     }
 
     @Test
+    public void shouldReturnNotFoundWhenGetOneProductsReturnsEmpty() throws Exception {
+        ProductResponse expected = getProductResponse("test 1", new BigDecimal("100"), new BigDecimal("105"));
+        Optional<ProductResponse> optExpected = Optional.empty();
+        Mockito.when(service.findById(expected.getId())).thenReturn(optExpected);
+
+        mvc.perform(get(resource + "/" + expected.getId()))
+                .andExpect(status().isNotFound())
+                .andDo(document("getById_Empty"));
+    }
+
+    @Test
     public void shouldAddNewProductAndReturnOk() throws Exception {
         String nome = "test 1";
         BigDecimal precoBase = new BigDecimal("100");
