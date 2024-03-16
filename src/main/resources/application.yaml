@@ -22,7 +22,7 @@ spring:
   jpa:
     database: POSTGRESQL
     show-sql: true
-    hibernate.ddl-auto: none
+    hibernate.ddl-auto: create
 
 ---
 spring:

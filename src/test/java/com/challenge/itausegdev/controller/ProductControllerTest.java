@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ProductController.class)
 @RunWith(SpringRunner.class)
+@AutoConfigureRestDocs(outputDir = "target/snippets")
 public class ProductControllerTest {
 
     @Autowired
@@ -57,7 +60,8 @@ public class ProductControllerTest {
 
         mvc.perform(get(resource))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$").isArray())
+                .andDo(document("listAll"));
     }
 
     @Test
@@ -69,11 +73,12 @@ public class ProductControllerTest {
         mvc.perform(get(resource + "/" + expected.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome", is(expected.getNome())))
-                .andExpect(jsonPath("$.categoria", is(expected.getCategoria())));
+                .andExpect(jsonPath("$.categoria", is(expected.getCategoria())))
+                .andDo(document("getById"));
     }
 
     @Test
-    public void shouldAddNewAndReturnOk() throws Exception {
+    public void shouldAddNewProductAndReturnOk() throws Exception {
         String nome = "test 1";
         BigDecimal precoBase = new BigDecimal("100");
         ProductResponse expected = getProductResponse(nome, precoBase, new BigDecimal("105"));
@@ -86,7 +91,8 @@ public class ProductControllerTest {
                         .content(new GsonBuilder().create().toJson(expected)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome", is(expected.getNome())))
-                .andExpect(jsonPath("$.categoria", is(expected.getCategoria())));
+                .andExpect(jsonPath("$.categoria", is(expected.getCategoria())))
+                .andDo(document("save"));
     }
 
     @Test
@@ -103,7 +109,8 @@ public class ProductControllerTest {
                         .content(new GsonBuilder().create().toJson(expected)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nome", is(expected.getNome())))
-                .andExpect(jsonPath("$.categoria", is(expected.getCategoria())));
+                .andExpect(jsonPath("$.categoria", is(expected.getCategoria())))
+                .andDo(document("update"));
     }
 
     @Test
@@ -127,7 +134,8 @@ public class ProductControllerTest {
         Mockito.doNothing().when(service).deleteById(expected);
 
         mvc.perform(delete(resource + "/" + expected))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("delete"));
     }
 
     @Test
