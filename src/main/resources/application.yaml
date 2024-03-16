@@ -8,6 +8,13 @@ spring:
   jpa:
     properties.hibernate.temp.use_jdbc_metadata_defaults: false
 
+tracing:
+  url: http://localhost:4317
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
 ---
 spring:
   config:
